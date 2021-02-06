@@ -1,0 +1,44 @@
+# Read in data
+
+pd.set_option("display.max_rows", 10)
+pd.set_option("display.max_columns", 10)
+pd.set_option("display.width", None)
+
+df = pd.read_csv("Bissouma Test.csv")
+
+
+# Renaming the column for easier reference and filtering df for only passes from Bissouma
+df = df.rename(columns={"type/displayName":"type", "outcomeType/displayName":"outcome"})
+passes = df[df["type"]=="Pass"]
+playerPass = passes[passes["playerId"]==303096]
+playerPass = playerPass.reset_index()
+print(playerPass.head(15))
+
+playerPass['x']=playerPass['x']*1.2
+playerPass['y']=playerPass['y']*0.8
+playerPass['endX']=playerPass['endX']*1.2
+playerPass['endY']=playerPass['endY']*0.8
+
+fig,ax = plt.subplots(figsize=(13.5, 8))
+fig.set_facecolor('grey')
+ax.patch.set_facecolor('grey')
+
+pitch = Pitch(pitch_type='statsbomb', orientation='horizontal', pad_bottom = 20,
+              pitch_color='grey', line_color='black', figsize=(16, 11),
+              constrained_layout=True, tight_layout=False)
+pitch.draw(ax=ax)
+#fig, ax = pitch.draw()
+
+plt.gca().invert_yaxis()
+
+for x in range(len(playerPass['x'])):
+    if playerPass["outcome"][x] == "Successful":
+        pitch.lines(playerPass.x, playerPass.y, playerPass.endX, playerPass.endY,
+            lw=3, comet=True, color= "green", ax=ax)
+        #plt.plot((playerPass["x"][x], playerPass["endX"][x]), (playerPass["y"][x], playerPass["endY"][x]),color= "mediumaquamarine")
+        #plt.scatter(playerPass["x"][x], playerPass["y"][x], color= "mediumaquamarine", edgecolors = "black")
+    if playerPass["outcome"][x] == "Unsuccessful":
+        #plt.plot((playerPass["x"][x], playerPass["endX"][x]), (playerPass["y"][x], playerPass["endY"][x]),color= "red")
+        pitch.lines(playerPass.x, playerPass.y, playerPass.endX, playerPass.endY,
+            lw=3, comet=True, color= "red", ax=ax)
+        #plt.scatter(playerPass["x"][x], playerPass["y"][x], color= "red")
